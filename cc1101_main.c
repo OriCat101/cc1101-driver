@@ -82,7 +82,7 @@ static int cc1101_spi_probe(struct spi_device *spi)
 
     // Reset the device, which will place it in idle and load the default config
     cc1101_reset(cc1101);
-    
+
     // Get the GPIO associated with the device in device tree
     gpio = devm_gpiod_get_index(&spi->dev, "int", 0, GPIOD_IN);
     if (IS_ERR(gpio))
@@ -117,7 +117,7 @@ static int cc1101_spi_probe(struct spi_device *spi)
 /*
 *   Function called on module removal for each CC1101 entry in device tree
 */
-static int cc1101_spi_remove(struct spi_device *spi)
+static void cc1101_spi_remove(struct spi_device *spi)
 {
     cc1101_t* cc1101;
     cc1101 = spi_get_drvdata(spi);
@@ -131,9 +131,7 @@ static int cc1101_spi_remove(struct spi_device *spi)
     // Remove /dev/cc1101.x.x
     cc1101_chrdev_remove_device(cc1101);
     CC1101_INFO(cc1101, "Removed");
-    return 0;
 }
-
 /*
 *   Register the module to handle cc1101 entries in device tree
 */
@@ -162,7 +160,7 @@ static struct spi_driver cc1101_driver = {
     .id_table = cc1101_id
 };
 
-/* 
+/*
 *   Functions executed on module insertion/removal
 *   Setup/remove the CC1101 character device class
 */
@@ -179,7 +177,7 @@ static int __init cc1101_init(void)
 module_init(cc1101_init);
 
 static void __exit cc1101_exit(void)
-{    
+{
     cc1101_chrdev_teardown(&cc1101_driver);
 }
 module_exit(cc1101_exit);

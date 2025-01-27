@@ -4,18 +4,18 @@ This project implements a Linux device driver for the Texas Instruments CC1101 r
 
 The CC1101 is a general purpose packet radio that operates in the Sub-GHz Industrial, Scientific and Medical (ISM) bands (315/433/868/915 MHz).
 
-This driver allows the use of inexpensive CC1101 Serial Peripheral Interface (SPI) modules, which can be directly interfaced to the Pi's GPIOs. A kernel module allows the CC1101 to operate using hardware interrupts instead of polling, which increases the accuracy of packet reception. 
+This driver allows the use of inexpensive CC1101 Serial Peripheral Interface (SPI) modules, which can be directly interfaced to the Pi's GPIOs. A kernel module allows the CC1101 to operate using hardware interrupts instead of polling, which increases the accuracy of packet reception.
 
 A [Python module](https://github.com/28757B2/cc1101-python) also exists to configure the driver and receive and transmit packets.
 
 Use of this software is at your own risk. You are responsible for complying with local laws and regulations.
 
 ## Supported Features
-The driver supports a subset of the CC1101 hardware's features and provides a high-level interface to the device that does not require setting of the individual hardware registers. 
+The driver supports a subset of the CC1101 hardware's features and provides a high-level interface to the device that does not require setting of the individual hardware registers.
 
 * Frequencies - 300-348/387-464/778-928 MHz
 * Modulation - OOK/2FSK/4FSK/GFSK/MSK
-* Data Rate - 0.6 - 500 kBaud 
+* Data Rate - 0.6 - 500 kBaud
 * RX Bandwidth - 58 - 812 kHz
 * Arbitrary packet length RX/TX
 * Sync word or carrier sense triggered RX
@@ -34,7 +34,7 @@ The following connections should be made between the CC1101 module and the Raspb
 | GDO2       | 22                |
 | GND        | 25                |
 
-A second radio can be connected to SPI bus 0 using the second chip enable pin: 
+A second radio can be connected to SPI bus 0 using the second chip enable pin:
 
 | CC1101 Pin | Raspberry Pi GPIO |
 |------------|-------------------|
@@ -64,13 +64,13 @@ sudo dkms build -m cc1101 -v 1.4.0
 sudo dkms install -m cc1101 -v 1.4.0
 
 # Enable SPI
-sudo sed -i "s/^#dtparam=spi=on$/dtparam=spi=on/" /boot/config.txt
+sudo sed -i "s/^#dtparam=spi=on$/dtparam=spi=on/" /boot/firmware/config.txt
 
 # Compile Device Tree overlay
 sudo dtc -@ -I dts -O dtb -o /boot/overlays/cc1101.dtbo cc1101.dts
 
 # Enable Device Tree overlay
-echo "dtoverlay=cc1101" | sudo tee -a /boot/config.txt
+echo "dtoverlay=cc1101" | sudo tee -a /boot/firmware/config.txt
 
 # Enable module loading at boot
 echo "cc1101" | sudo tee -a /etc/modules
@@ -82,7 +82,7 @@ echo 'SUBSYSTEM=="cc1101", OWNER="pi", GROUP="pi", MODE="0660"' | sudo tee -a /e
 reboot
 ```
 
-After rebooting, entries should appear in the `dmesg` output depending on where the CC1101 is attached:
+After rebooting, entries should appear in the `dmesg` output depending onconfig where the CC1101 is attached:
 
     [  726.808248] cc1101 spi0.1: Device not found (Partnum: 0x00, Version: 0x00)
     [  726.809093] cc1101 spi0.0: Ready (Partnum: 0x00, Version: 0x14)
@@ -149,6 +149,6 @@ To enable debug messages:
 
     # Raspberry Pi OS
     sudo modprobe cc1101 debug=1
-    
+
     # Ubuntu
     echo "module cc1101 +p" > /sys/kernel/debug/dynamic_debug/control

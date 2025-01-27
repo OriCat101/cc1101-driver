@@ -49,13 +49,13 @@ static DEFINE_MUTEX(device_list_lock);
 /*
 * Handler for open events to /dev/cc1101.x.x
 * Only one handle is allowed to transmit, receive or configure the device at a time
-* Operations will block until /dev/cc1101.x.x is closed  
+* Operations will block until /dev/cc1101.x.x is closed
 */
 static int chrdev_open(struct inode *inode, struct file *file)
 {
     cc1101_t* cc1101 = NULL;
     int device_index;
-    
+
     // Search the device list for the cc1101 struct relating to the chardev
     if(mutex_lock_interruptible(&device_list_lock) != 0) {
         return -EBUSY;
@@ -68,7 +68,7 @@ static int chrdev_open(struct inode *inode, struct file *file)
             }
         }
     }
-    
+
 	mutex_unlock(&device_list_lock);
 
     // This should never occur - a chardev shouldn't be created without a CC1101 being present
@@ -100,7 +100,7 @@ static int chrdev_release(struct inode *inode, struct file *file)
 /*
 * Handler for iotcl commands to /dev/cc1101.x.x
 * IOCTLs can be used to set and get the TX and RX config, reset the device
-* and retrieve the contents of the CC1101's registers 
+* and retrieve the contents of the CC1101's registers
 */
 static long chrdev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
@@ -172,7 +172,7 @@ static long chrdev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
             // Write the configuration to the device
             cc1101_config_apply_rx(cc1101);
-            
+
             // Enter RX mode on the device
             cc1101_rx(cc1101);
 
@@ -212,7 +212,7 @@ static long chrdev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
             ret = 0;
 #else
             ret = -EPERM;
-#endif 
+#endif
             break;
 
         // Returns the TX config configured in the driver to userspace
@@ -306,7 +306,7 @@ done:
 
 /*
 * Handler for write events to /dev/cc1101.x.x
-* Written bytes are transmitted by the CC1101 according the TX config 
+* Written bytes are transmitted by the CC1101 according the TX config
 */
 static ssize_t chrdev_write(struct file *file, const char __user *buf, size_t len, loff_t *off)
 {
@@ -314,8 +314,8 @@ static ssize_t chrdev_write(struct file *file, const char __user *buf, size_t le
     cc1101_t* cc1101 = file->private_data;
     ssize_t ret;
     unsigned char *tx_bytes;
- 
- 
+
+
     // Check the number of bytes to be transmitted are allowed
     if (len > max_packet_size) {
         ret = -EMSGSIZE;
@@ -359,7 +359,7 @@ done:
     return ret;
 #else
     return -EPERM;
-#endif 
+#endif
 }
 
 /*
@@ -368,7 +368,7 @@ done:
 int cc1101_chrdev_add_device(cc1101_t * cc1101) {
     int ret;
     int device_index;
- 
+
     mutex_lock(&device_list_lock);
 
     // Search for a free minor number
@@ -402,8 +402,8 @@ done:
 void cc1101_chrdev_remove_device(cc1101_t * cc1101) {
     mutex_lock(&device_list_lock);
 
-    // Destroy the character device and remove the entry from the device list    
-    device_destroy(dev_class, cc1101->devt);	
+    // Destroy the character device and remove the entry from the device list
+    device_destroy(dev_class, cc1101->devt);
     device_list[MINOR(cc1101->devt)] = NULL;
 
     mutex_unlock(&device_list_lock);
@@ -431,8 +431,8 @@ int cc1101_chrdev_setup(struct spi_driver* cc1101_driver)
 	if (ret < 0) {
         goto err_register;
     }
-
-	dev_class = class_create(THIS_MODULE, "cc1101");
+	// per https://github.com/28757B2/cc1101-driver/issues/8#issuecomment-2179558238
+	dev_class = class_create("cc1101");
 	if (IS_ERR(dev_class)) {
 		ret = PTR_ERR(dev_class);
         goto err_class_create;
