@@ -378,7 +378,7 @@ int cc1101_chrdev_add_device(cc1101_t * cc1101) {
             cc1101->devt = MKDEV(SPI_MAJOR_NUMBER, device_index);
 
             // Create a /dev/cc1101.x.x character device
-            if(IS_ERR(device_create(dev_class, &cc1101->spi->dev, cc1101->devt, cc1101, "cc1101.%d.%d", cc1101->spi->master->bus_num, cc1101->spi->chip_select))) {
+            if(IS_ERR(device_create(dev_class, &cc1101->spi->dev, cc1101->devt, cc1101, "cc1101.%d.%d", cc1101->spi->controller->bus_num, cc1101->spi->chip_select))) {
                 ret = -ENODEV;
                 goto done;
             }
