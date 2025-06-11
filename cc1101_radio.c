@@ -505,11 +505,11 @@ void cc1101_rx_timeout_work(struct work_struct *work){
 */
 void cc1101_rx_timeout(struct timer_list *t){
     // Get the device the timeout has occured on
-    cc1101_t *cc1101 = from_timer(dev, t, rx_timeout);
-    CC1101_ERROR(cc1101, "RX Interrupt Missed");
+    cc1101_t *dev = from_timer(dev, t, rx_timeout);
+    CC1101_ERROR(dev, "RX Interrupt Missed");
 
     // Schedule the handler to be called in the process context to recover
-    INIT_WORK(&cc1101->rx_timeout_work, cc1101_rx_timeout_work);
-    schedule_work(&cc1101->rx_timeout_work);
+    INIT_WORK(&dev->rx_timeout_work, cc1101_rx_timeout_work);
+    schedule_work(&dev->rx_timeout_work);
 }
 
